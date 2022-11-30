@@ -1,0 +1,49 @@
+.cards {
+    border: solid 1px black;
+    width:600px;
+    height: auto;
+    background-color: aqua;
+}
+
+.cardsSoldout {
+    border: solid 1px black;
+    width:600px;
+    height: auto;
+    background-color: rgb(255, 98, 0);
+}
+
+img {
+    width: 100px;
+    height: 100px;
+}
+
+.checkoutEmpty {
+    display: none;
+}
+
+.checkoutFilled {
+    display: flex;
+    background-color:blueviolet;
+    width:600px;
+    height: auto;
+}
+
+.buttonDisabled {
+    border: 1px solid #999999;
+    background-color: #cccccc;
+    color: #666666;
+}
+
+.emptyBasket {
+    display: none
+}
+
+.filedBasket {
+    display: block
+}
+
+input {
+    width: 300px;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
