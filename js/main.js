@@ -1,60 +1,38 @@
-//como voy actualizando el stock a medida que se agregan items al carrito, guardo en LS para mantenerlo por si cierran el browser
-let books = []
 function resetArrBooks() {
-    books = JSON.parse(localStorage.getItem("books")) || [{
-        id: 1,
-        title: "El poder de las palabras",
-        author: "Sigman, Mariano",
-        content_short: "Es posible cambiar; en cualquier momento de la vida; nuestras ideas más arraigadas; nuestra forma de pensar y también nuestra experiencia emocional. Para lograrlo es suficiente una herramienta sencilla y extremadamente efectiva en la transformación de nuestro cerebro: el buen uso de la conversac...",
-        publisher: "Debate",
-        publisher_date: "2022",
-        pages: "352",
-        language: "spanish",
-        cover: "https://www.tematika.com/media/catalog/Ilhsa/Imagenes/697635.jpg",
-        stock: 99,
-        price: 4349
-    },
-    {
-        id: 2,
-        title: "Historias de la belle epoque argentina",
-        author: "Balmaceda, Daniel",
-        content_short: "Una invitación a recorrer los espléndidos años dorados de la Belle Époque argentina. De las últimas décadas del siglo XIX al Centenario de la Revolución de Mayo; en 1910; y los años previos a la Primera Guerra Mundial...",
-        publisher: "Sudamericana",
-        publisher_date: "2022",
-        pages: "384",
-        language: "spanish",
-        cover: "https://www.tematika.com/media/catalog/Ilhsa/Imagenes/699579.jpg",
-        stock: 1,
-        price: 4099
-    },
-    {
-        id: 3,
-        title: "Horoscopo chino 2023",
-        author: "Squirru Dari, Ludovica",
-        content_short: "El nuevo libro de predicciones de la astróloga best seller Ludovica Squirru Dari para el 2023; año del Conejo de agua...",
-        publisher: "Grupo Zeta",
-        publisher_date: "2022",
-        pages: "448",
-        language: "spanish",
-        cover: "https://www.tematika.com/media/catalog/Ilhsa/Imagenes/698681.jpg",
-        stock: 2,
-        price: 2999
-    },
-    {
-        id: 4,
-        title: "Violeta",
-        author: "Allende, Isabel",
-        content_short: "La épica y emocionante historia de una mujer cuya vida abarca los momentos históricos más relevantes del siglo XX. Desde 1920 -con la llamada «gripe española»- hasta la pandemia de 2020; la vida de Violeta será mucho más que la historia de un siglo...",
-        publisher: "Sudamericana",
-        publisher_date: "2022",
-        pages: "400",
-        language: "spanish",
-        cover: "https://www.tematika.com/media/catalog/Ilhsa/Imagenes/690814.jpg",
-        stock: 0,
-        price: 5449
-    }
-]
+    console.log("hoo")
+    // Ejemplo funcional de fetch
+    // fetch("../books.json")
+    // .then(response => response.json())
+    // .then(data => {
+    //   //accedo a los datos del json
+    //   console.log(data.length)
+    //   main(data)
+    // })
+    // .catch(error => {
+    //   // En caso de error, se ejecutará este código
+    //   console.error('Ha habido un problema con la solicitud:', error);
+    // });
+
+
+    //usamos axios para obtener la información provista en el archivo books.json
+    axios.get('../books.json')
+        .then(response => {
+            // accededemos a los datos del archivo JSON a través de la propiedad "response.data"
+            main(response.data)
+        })
+        .catch(error => {
+            // mostramos mensaje de error usando la librería sweetalert
+            Swal.fire({
+                title: 'Error!',
+                text: `Ha habido un problema con la solicitud: ${error}`,
+                icon: 'error',
+                confirmButtonText: 'Continuar'
+            }) 
+        });
 }
+
+function main(books) {
+//como voy actualizando el stock a medida que se agregan items al carrito, guardo en LS para mantenerlo por si cierran el browser
 
 //me traigo del DOM los elementos que voy a modificar
 let container = document.getElementById("container")
@@ -63,7 +41,7 @@ let checkout = document.getElementById("checkout")
 //Si la lista del localStorage esta vacia, la defino sin elementos
 let basket = JSON.parse(localStorage.getItem("basket")) || []
 //inicializo el array books
-resetArrBooks()
+// resetArrBooks2()
 
 //si el carrito tiene elementos, le piso la clase default que lo oculta
 if (basket.length > 0) { 
@@ -84,15 +62,21 @@ btnEmptyBasket.addEventListener("click", () => {
     //vacío la key que tengo en el LS para los items del carrito
     localStorage.removeItem("basket")
     //vacío la key de books que tengo en LS, ya que se libera el stock
-    localStorage.removeItem("books")
+    // localStorage.removeItem("books")
     //renderizo para que el DOM esté actualizado
     btnEmptyBasket.className="emptyBasket"
     renderCheckout()
+
+    // mostramos mensaje de error usando la librería sweetalert
+    Swal.fire({
+        title: 'Éxito!',
+        text: 'Carrito vaciado exitosamente!',
+        icon: 'ok',
+        confirmButtonText: 'Continuar'
+    })
     //reinicializo el array con los valores originales
     resetArrBooks()
-    renderContainer(books)
-
-    alert("Carrito vaciado exitosamente!")    
+    
 })
 
 //función encargada de actualizar los cambios en el DOM, sección listado libros
@@ -167,6 +151,13 @@ function addItemBasket(e) {
     
     renderCheckout()
     renderContainer(books)
+    // mostramos mensaje de error usando la librería sweetalert
+    Swal.fire({
+        title: 'Éxito!',
+        text: `Se agregó al carrito : ${book.title}`,
+        icon: 'ok',
+        confirmButtonText: 'Continuar'
+    }) 
 }
 //funcion encargada de actualizar el stock de libros
 function updateStock(bookId){
@@ -177,8 +168,8 @@ function updateStock(bookId){
       }
     }
     //vacio el LS y lo vuelvo a cargar con la data actualizada
-    localStorage.removeItem("books")
-    localStorage.setItem("books",JSON.stringify(books))
+    // localStorage.removeItem("books")
+    // localStorage.setItem("books",JSON.stringify(books))
 }
 //función encargada de renderizar el carrito
 function renderCheckout(){
@@ -200,3 +191,5 @@ function renderCheckout(){
         btnEmptyBasket.className="filledBasket"
     }
 }
+}
+resetArrBooks()
