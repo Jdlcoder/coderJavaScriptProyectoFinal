@@ -1,19 +1,5 @@
+//funcion encargada de traer los libros que estan en un archivo json mediante la libreria Axios
 function resetArrBooks() {
-    console.log("hoo")
-    // Ejemplo funcional de fetch
-    // fetch("../books.json")
-    // .then(response => response.json())
-    // .then(data => {
-    //   //accedo a los datos del json
-    //   console.log(data.length)
-    //   main(data)
-    // })
-    // .catch(error => {
-    //   // En caso de error, se ejecutará este código
-    //   console.error('Ha habido un problema con la solicitud:', error);
-    // });
-
-
     //usamos axios para obtener la información provista en el archivo books.json
     axios.get('../books.json')
         .then(response => {
@@ -31,97 +17,92 @@ function resetArrBooks() {
         });
 }
 
+//funcion principal encargada de escribir el DOM
 function main(books) {
-    //como voy actualizando el stock a medida que se agregan items al carrito, guardo en LS para mantenerlo por si cierran el browser
-
     //me traigo del DOM los elementos que voy a modificar
     let container = document.getElementsByClassName("container")[0]
     let checkout = document.getElementById("checkout")
+    let buttonShowBasket = document.getElementById('btnVerCarrito')
+    let btnEmptyBasket = document.getElementById("emptyBasket")
+    let btnHome = document.getElementById("btnHome")
 
     //Si la lista del localStorage esta vacia, la defino sin elementos
     let basket = JSON.parse(localStorage.getItem("basket")) || []
-    //inicializo el array books
-    // resetArrBooks2()
-
-    //si el carrito tiene elementos, le piso la clase default que lo oculta
-    if (basket.length > 0) {
-        checkout.className = "checkoutFilled"
-        renderCheckout()
-    }
 
     //agrego funcionalidad de filtrado de los libros que se muestran según el título
     let inFinderByTitle = document.getElementById("inFinderByTitle")
     inFinderByTitle.addEventListener("input", filterByTitle)
     renderContainer(books)
 
-    //agrego funcionaidad para vaciar carrito
-    let btnEmptyBasket = document.getElementById("emptyBasket")
-    btnEmptyBasket.addEventListener("click", () => {
-        //dejo en 0 la lista del carrito
-        basket = []
-        //vacío la key que tengo en el LS para los items del carrito
-        localStorage.removeItem("basket")
-        //vacío la key de books que tengo en LS, ya que se libera el stock
-        // localStorage.removeItem("books")
-        //renderizo para que el DOM esté actualizado
-        btnEmptyBasket.className = "emptyBasket"
+    //agrego funcionalidad al boton Ver Carrito
+    buttonShowBasket.addEventListener('click', () => {
+        //limpio pantalla del catalogo y recargo el carrito
+        container.innerHTML = ""
         renderCheckout()
-
-        // mostramos mensaje de error usando la librería sweetalert
-        Swal.fire({
-            title: 'Éxito!',
-            text: 'Carrito vaciado exitosamente!',
-            icon: 'success',
-            confirmButtonText: 'Continuar'
-        })
-        //reinicializo el array con los valores originales
-        resetArrBooks()
-
     })
+
+    //agrego funcionalidad para Vaciar carrito
+    btnEmptyBasket.addEventListener("click", emptyBasket)
+
+    //agrego funcionalidad al boton Ver Carrito
+    btnHome.addEventListener('click', () => {
+        //limpio pantalla del catalogo y recargo el carrito
+        //reinicializo las pantallas
+        checkout.innerHTML=""
+        renderContainer(books)
+        main(books)
+    })
+
+    //muestro los botones de Ver y Vaciar carrito solo si hay elementos
+    renderBtnNavCheckout()
 
     //función encargada de actualizar los cambios en el DOM, sección listado libros
     function renderContainer(arrBooks) {
         container.innerHTML = ""
-        arrBooks.forEach(el => {
-            let cards = document.createElement("div")
-            let buttonClass = "btnAddItemBasquet"
-            let buttonText = "Agregar al carrito"
-            let stockClass = ""
-            cards.className = "card"
-            //defino el estilo según existencia de stock
-            if (!el.stock > 0) {
-                //si no hay stock, deshabilito el boton de agregar al carrito
-                buttonClass = "buttonDisabled"
-                buttonText = "Agregar al carrito"
-                buttonText = "Sin Stock"
-                stockClass = "stockEmpty"
+        if (arrBooks.length > 0) {
+            arrBooks.forEach(el => {
+                let cards = document.createElement("div")
+                let buttonClass = "btnAddItemBasquet"
+                let buttonText = "Agregar al carrito"
+                let stockClass = ""
+                cards.className = "card"
 
-            }
+                //defino el estilo según existencia de stock
+                if (!el.stock > 0) {
+                    //si no hay stock, deshabilito el boton de agregar al carrito
+                    buttonClass = "buttonDisabled"
+                    buttonText = "Agregar al carrito"
+                    buttonText = "Sin Stock"
+                    stockClass = "stockEmpty"
+                }
 
-            cards.innerHTML = `
-            <div class="card-item">
-                <h1 class="title">${el.title}</h1>
-                <h4>
-                    <span>Disponibilidad:</span>
-                    <span class="${stockClass}">${el.stock > 0 ? el.stock+" u" :"Agotado"}</span>
-                </h4>
-                <h4 class="price">Precio:$${el.price}</h4>
-                <img class="book-image" src =${el.cover}>
-                <div class ="card__btn">
-                    <button class="${buttonClass}" id=${el.id}>${buttonText}</button>
-                </div>
-            </div>`
-            console.log(cards)
-            container.append(cards)
+                cards.innerHTML = `
+                <div class="card-item">
+                    <h1 class="title">${el.title}</h1>
+                    <h4>
+                        <span>Disponibilidad:</span>
+                        <span class="${stockClass}">${el.stock > 0 ? el.stock+" u" :"Agotado"}</span>
+                    </h4>
+                    <h4 class="price">Precio:$${el.price}</h4>
+                    <img class="book-image" src =${el.cover}>
+                    <div class ="card__btn">
+                        <button class="${buttonClass}" id=${el.id}>${buttonText}</button>
+                    </div>
+                </div>`
+                container.append(cards)
 
-            if (el.stock > 0) {
-                //solo le agrego el evento si hay stock
-                let buttonAddItem = document.getElementById(el.id)
-                buttonAddItem.addEventListener("click", addItemBasket)
-            }
+                if (el.stock > 0) {
+                    //solo le agrego el evento si hay stock
+                    let buttonAddItem = document.getElementById(el.id)
+                    buttonAddItem.addEventListener("click", addItemBasket)
+                }
+            })
 
-        })
-        renderCheckout()
+            //muestro los botones de Ver y Vaciar carrito solo si hay elementos
+            renderBtnNavCheckout()
+        } else {
+            container.innerHTML = "<h1>No se encontraron coincidencias con su búsqueda</h1>"
+        }
     }
 
     //función encargada de filtrar los libros por coincidencia de título
@@ -130,7 +111,7 @@ function main(books) {
         renderContainer(booksFilteredByTitle)
     }
 
-
+    //funcion encargada de agregar item al carrito
     function addItemBasket(e) {
 
         //agrego al carrito, pero antes veo si tiene pedidos del mismo item. en ese caso, incremento count
@@ -169,7 +150,6 @@ function main(books) {
         localStorage.removeItem("basket")
         localStorage.setItem("basket", JSON.stringify(basket))
 
-        renderCheckout()
         renderContainer(books)
         // mostramos mensaje de error usando la librería sweetalert
         Swal.fire({
@@ -180,28 +160,26 @@ function main(books) {
         })
     }
 
+    //funcion encargada de borrar de a un item del carrito
     function delItemBasket(e) {
         let id = e.target.id.split('_')[1]
-        console.log("hiconer clic en quitar elemento " + id)
         //agrego al carrito, pero antes veo si tiene pedidos del mismo item. en ese caso, incremento count
         let itemInBasket = basket.find((book) => book.id == id) || []
         let tmpcount
         let book = books.find((el) => el.id == id)
-        console.log("imprimo book en delItem:" + book + " id:" + id)
 
         //para que no me queden elementos duplicados en el array basket, busco el que está, lo borro y cargo el nuevo objeto
         let idxBasket = basket.findIndex(book => book.id == id)
-
         let basket_updated = basket.splice(idxBasket, 1)
-
-        //TODO: Queda pendiente ver cómo actualizar el stock cuando borran un elemento del carriro.updateStock(book.id)
 
         //vacio el LS y lo vuelvo a cargar con la data actualizada
         localStorage.removeItem("basket")
         localStorage.setItem("basket", JSON.stringify(basket_updated))
 
-        renderCheckout()
+        //reinicializo las pantallas
+        checkout.innerHTML=""
         renderContainer(books)
+
         // mostramos mensaje de error usando la librería sweetalert
         Swal.fire({
             title: 'Éxito!',
@@ -210,6 +188,42 @@ function main(books) {
             confirmButtonText: 'Continuar'
         })
     }
+
+    //funcion encargada de vaciar el carrito
+    function emptyBasket() {
+        // mostramos mensaje de error usando la librería sweetalert
+        Swal.fire({
+                title: 'Estas por vaciar el carrito...',
+                text: 'Estás seguro?',
+                showCancelButton: true,
+                icon: 'warning',
+                confirmButtonText: 'Sí, eliminar',
+                cancelButtonText: "Cancelar",
+            })
+            .then(resultado => {
+                if (resultado.value) {
+                    basket = []
+                    //vacio el LS y lo vuelvo a cargar con la data actualizada
+                    localStorage.removeItem("basket")
+                    renderCheckout()
+                    renderContainer(books)
+                    Swal.fire({
+                        title: 'Éxito!',
+                        text: 'Se vació el carrito correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Continuar'
+                    })
+                } else {
+                    Swal.fire({
+                        title: 'Sin cambios',
+                        text: 'El carrito no se ha modificado',
+                        icon: 'success',
+                        confirmButtonText: 'Continuar'
+                    })
+                }
+            })
+    }
+
     //funcion encargada de actualizar el stock de libros
     function updateStock(bookId) {
         let idxBook = books.findIndex(book => book.id == bookId)
@@ -228,18 +242,29 @@ function main(books) {
                 price: books[idxBook].price
             }
         }
-        //vacio el LS y lo vuelvo a cargar con la data actualizada
-        // localStorage.removeItem("books")
-        // localStorage.setItem("books",JSON.stringify(books))
     }
+
+    //funcion para controlar la vista de los botones del carrito en el nav
+    function renderBtnNavCheckout() {
+        //si hay elementos en el carrito, le agrego el eventListener a los botones de Ver y Vaciar carrito
+        if (basket.length > 0) {
+            buttonShowBasket.className = "showBasket"
+            btnEmptyBasket.className = "showBasket"
+        } else {
+            buttonShowBasket.className = "emptyBasket"
+            btnEmptyBasket.className = "emptyBasket"
+        }
+    }
+
     //función encargada de renderizar el carrito
     function renderCheckout() {
         checkout.innerHTML = ""
-        let total = 0
         if (basket.length > 0) {
-            console.log("cantidad items carrito:" + basket.length)
-            checkout.className = "checkoutFilled"
+            //inicializo contador para calcular el importe total
+            let total = 0
+
             checkout.innerHTML = `
+            <h1>Detalle de tu pedido</h1>
             <div class="row headings">
                 <div class="col basket_title">Producto</div>
                 <div class="col basket_price">Precio Unitario</div>
@@ -251,24 +276,33 @@ function main(books) {
             for (const item of basket) {
                 let checkoutID = "checkout_" + item.id
                 checkout.innerHTML += `
-            <div class=row headings">
-                <div class="col basket_title">${item.title}</div>
-                <div class="col basket_price">${item.price}</div>
-                <div class="col basket_count">${item.count}</div>
-                <div class="col basket_subtotal">${item.subtotal}</div>
-                <button class="checkoutBtn" id=${checkoutID}>X</button>
-            </div>`
+                <div class=row headings">
+                    <div class="col basket_title">${item.title}</div>
+                    <div class="col basket_price">${item.price}</div>
+                    <div class="col basket_count">${item.count}</div>
+                    <div class="col basket_subtotal">${item.subtotal}</div>
+                    <button class="checkoutBtn" id=${checkoutID}>X</button>
+                </div>`
 
-            let buttonDelItem = document.getElementById(checkoutID)
-            console.log(buttonDelItem)
-            buttonDelItem.addEventListener("click", delItemBasket)
-
-            total += item.subtotal
-
+                total += item.subtotal
             }
-            checkout.innerHTML += `<div class ="basket_total">Total:$${total}</div>`
+
+            //Muestro los botones Ver y Vaciar carrito sólo si no está vacío
+            renderBtnNavCheckout()
+
+            //agrego el importe total a pagar
+            let totalHTML = document.createElement('div')
+            totalHTML.innerHTML = `<h1 class="basket_total">Total $${total}</h1>`
+            checkout.append(totalHTML)
+
+            for (const item of basket) {
+                let checkoutID = "checkout_" + item.id
+                let buttonDelItem = document.getElementById(checkoutID)
+                buttonDelItem.addEventListener("click", delItemBasket)
+            }
         }
-        
     }
 }
+
+//Hace el fetch para traerl los libros del JSON y llamar al main
 resetArrBooks()

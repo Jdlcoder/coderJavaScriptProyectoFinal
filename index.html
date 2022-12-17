@@ -1,24 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="./css/estilos.css">
-    
-    <title>Tercera Entrega Trabajo Final</title>
+
+    <title>Entrega Trabajo Final Javier De Luca</title>
 </head>
+
 <body>
-    <h1>.::: Librería Atenea :::.</h1>
-    <input type="text" name="Buscador" id="inFinderByTitle" placeholder="Ingrese título a buscar">
+    <header>
+        <nav>
+            <h1 class="header_title">.::: Librería Atenea :::.</h1>
+            <input type="text" name="Buscador" id="inFinderByTitle" placeholder="Ingrese título a buscar">
+            <button class="btnHome" id="btnHome">Home</button>
+            <button class="emptyBasket" id="emptyBasket">Vaciar Carrito</button>
+            <button class="btnVerCarrito" id="btnVerCarrito">Ver Carrito</button>
+        </nav>
+    </header>
+
     <div class="container"></div>
     <div id="checkout"></div>
-    <button class="emptyBasket" id="emptyBasket">Vaciar Carrito</button>
-    
+
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- SweetAlert -->
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>
